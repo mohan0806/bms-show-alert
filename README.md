@@ -51,7 +51,7 @@ format.
 
 ## What you need
 
-- An **Android phone**, kept on charge while watching (or a Mac, see below)
+- An **Android phone** (or a Mac, see below) and if you are leaving phone to watch overnight as well, make sure to keep it on charge).
 - About **15 minutes** for the first setup
 - Optional: **Telegram**, if you also want a message with the showtimes
 
