@@ -59,10 +59,38 @@ format.
 
 ## Step 1: Install the apps on your phone
 
-1. Install **Termux** and **Termux:API**.
-   - Get both from **F-Droid** (https://f-droid.org), **or** both from Google Play.
-   - **Don't mix sources** (one from F-Droid, one from Play). The alarm needs Termux:API,
-     and mixed sources break it.
+1. Install **Termux** and **Termux:API** from F-Droid (recommended). Do this on your phone,
+   in Chrome:
+
+   | App | Open this page on your phone | Download size |
+   |---|---|---|
+   | **Termux** | https://f-droid.org/packages/com.termux/ | about 109 MiB |
+   | **Termux:API** (needed for the alarm) | https://f-droid.org/en/packages/com.termux.api/ | about 3.8 MiB |
+
+   On each page:
+   1. Scroll down to **Packages**. The first version listed is the latest.
+   2. Under that latest version, below its list of permissions, tap **Download APK**.
+      (You don't need "PGP Signature" or "Build Log".)
+   3. Open the downloaded file. If Android asks, allow Chrome to **Install unknown apps**
+      (Settings → Apps → Chrome → Install unknown apps → Allow), then tap **Install**.
+
+   Install **Termux first**, then **Termux:API**.
+
+   > **Blocked by Google Play Protect?** Play Protect sometimes blocks or warns about apps
+   > installed from outside the Play Store. To install, pause it for a moment:
+   > 1. Open the **Play Store** app.
+   > 2. Tap your **profile icon** (top right) → **Play Protect** → the **settings gear** (top right).
+   > 3. Turn off **Scan apps with Play Protect** (Android may call this "pause").
+   > 4. Install Termux and Termux:API.
+   > 5. **Turn Play Protect back on** afterwards. It keeps your phone safe, and the installed
+   >    apps keep working.
+
+   > **Important:** install both apps from the **same place**. If you already have Termux from
+   > Google Play, uninstall it first, or get Termux:API from Google Play too. Mixing sources
+   > (one from F-Droid, one from Play) breaks the alarm.
+
+   *The permission lists on those pages (vibration, alarms, keeping the phone awake, storage)
+   are normal for these apps; the alarm uses them.*
 2. Stop Android from killing it at night:
    **Settings → Apps → Termux → Battery → Unrestricted**. Do the same for **Termux:API**.
 3. Allow notifications for Termux when asked.
@@ -85,7 +113,7 @@ In Termux, run these lines one at a time:
 
 ```bash
 pkg install -y git
-git clone https://github.com/<your-github-username>/bms-show-alert.git
+git clone https://github.com/mohan0806/bms-show-alert.git
 cd bms-show-alert
 bash setup_termux.sh
 ```
@@ -277,7 +305,7 @@ Useful as a second watcher while your Mac is awake (it doesn't work while the Ma
 2. In the **Terminal** app:
 
    ```bash
-   git clone https://github.com/<your-github-username>/bms-show-alert.git
+   git clone https://github.com/mohan0806/bms-show-alert.git
    cd bms-show-alert
    cp config.example.env config.env
    open -e config.env            # edit, save, close
@@ -307,7 +335,9 @@ the alert on your phone).
 | `page title: "Attention Required! \| Cloudflare"` | BookMyShow's bot check blocked the page. Wait 30 to 60 minutes, increase `CHECK_EVERY_SECONDS`, and make sure you're on your home Wi-Fi or mobile data (not a VPN). |
 | `Chromium not found` | Run `pkg install x11-repo && pkg install chromium`. |
 | Lots of `dbus` / `inotify` error lines | Harmless Chromium noise. Ignore them. |
-| `Termux:API tools not found` / no alarm sound | Run `pkg install termux-api`, and install the **Termux:API** app from the same source as Termux. |
+| `Termux:API tools not found` / no alarm sound | Run `pkg install termux-api`, and install the **Termux:API** app ([F-Droid page](https://f-droid.org/en/packages/com.termux.api/)) from the same source as Termux. |
+| "Blocked by Play Protect" / "Unsafe app blocked" | Temporarily turn off Play Protect (Play Store → profile icon → Play Protect → settings gear → Scan apps off), install, then turn it back on. See Step 1. |
+| "App not installed" when installing Termux:API | Termux and Termux:API came from different places. Uninstall both and install both from F-Droid (Step 1). |
 | Alarm silent in Do Not Disturb | Allow **Alarms** in your Do Not Disturb / Bedtime settings, and turn up the alarm volume. |
 | It stopped overnight | Set Termux's battery setting to **Unrestricted**, keep the phone charging, and don't swipe Termux away. |
 | `Telegram error 401` | Bot token is wrong. Copy it again from @BotFather (`/mybots` → your bot → API Token). |
