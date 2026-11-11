@@ -1,13 +1,12 @@
 # BMS Show Alert
 
-Get alerted **the moment a BookMyShow show opens for booking**, for any movie, cinema, date,
+Get woken up **the moment a BookMyShow show opens for booking**, for any movie, cinema, date,
 language and format (2D, 3D, IMAX, Dolby Cinema...).
 
-When your show appears, you get:
-
-- a **Telegram message** with the showtimes, prices and a booking link,
-- an optional **Telegram voice call** (so it wakes you up at night),
-- a **loud alarm** on your Android phone (or a spoken alert on a Mac).
+When your show appears, your **Android phone rings a loud alarm**: a spoken announcement with
+the showtimes on the alarm channel (works in Do Not Disturb), strong vibration and a
+notification. Optionally, it also sends you a **Telegram message** with the showtimes and a
+booking link.
 
 It runs on your **Android phone** (recommended) or a **Mac**. No coding needed: you copy a few
 commands and fill in a settings file.
@@ -18,18 +17,17 @@ commands and fill in a settings file.
 
 1. [How it works (30 seconds)](#how-it-works)
 2. [What you need](#what-you-need)
-3. [Step 1: Create your Telegram bot](#step-1-create-your-telegram-bot)
-4. [Step 2: Install the apps on your phone](#step-2-install-the-apps-on-your-phone)
-5. [Step 3: Download BMS Show Alert](#step-3-download-bms-show-alert)
-6. [Step 4: Copy the cinema link from BookMyShow](#step-4-copy-the-cinema-link-from-bookmyshow)
-7. [Step 5: Fill in your settings](#step-5-fill-in-your-settings)
-8. [Step 6: Test everything](#step-6-test-everything)
-9. [Step 7: Start watching](#step-7-start-watching)
-10. [Optional: Telegram wake-up call](#optional-telegram-wake-up-call)
-11. [All settings explained](#all-settings-explained)
-12. [Using it on a Mac](#using-it-on-a-mac)
-13. [Troubleshooting](#troubleshooting)
-14. [FAQ](#faq)
+3. [Step 1: Install the apps on your phone](#step-1-install-the-apps-on-your-phone)
+4. [Step 2: Download BMS Show Alert](#step-2-download-bms-show-alert)
+5. [Step 3: Copy the cinema link from BookMyShow](#step-3-copy-the-cinema-link-from-bookmyshow)
+6. [Step 4: Fill in your settings](#step-4-fill-in-your-settings)
+7. [Step 5: Test everything](#step-5-test-everything)
+8. [Step 6: Start watching](#step-6-start-watching)
+9. [Optional: Telegram messages](#optional-telegram-messages)
+10. [All settings explained](#all-settings-explained)
+11. [Using it on a Mac](#using-it-on-a-mac)
+12. [Troubleshooting](#troubleshooting)
+13. [FAQ](#faq)
 
 ---
 
@@ -41,8 +39,8 @@ format.
 
 - If the date **isn't open yet**, BookMyShow quietly shows today's page instead, so the script
   knows to keep waiting.
-- When the date **opens** and your show is listed, it alerts you right away.
-- If more shows are added later, you get another alert for the new ones.
+- When the date **opens** and your show is listed, the alarm goes off right away.
+- If more shows are added later, it alerts you again for the new ones.
 - It stops by itself after your dates have passed.
 
 > **Why on your phone and not "in the cloud"?** BookMyShow blocks requests from cloud servers
@@ -53,41 +51,18 @@ format.
 
 ## What you need
 
-- An **Android phone** (kept on charge while watching), or a Mac
-- **Telegram** on your phone
+- An **Android phone**, kept on charge while watching (or a Mac, see below)
 - About **15 minutes** for the first setup
+- Optional: **Telegram**, if you also want a message with the showtimes
 
 ---
 
-## Step 1: Create your Telegram bot
-
-The bot is what sends you messages. It's free and takes 2 minutes.
-
-1. Open Telegram and search for **@BotFather** (it has a blue tick).
-2. Send it: `/newbot`
-3. Give it any name (e.g. `My Movie Alerts`) and a username ending in `bot`
-   (e.g. `mohan_movie_alert_bot`).
-4. BotFather replies with a **token** like `1234567890:AAH...xyz`.
-   **Copy it and keep it private**, it's like a password for your bot.
-5. Open your new bot (tap the link BotFather gives you) and press **Start**, or send it `hi`.
-6. Get your **chat ID**: in a browser, open this link with your token pasted in:
-
-   ```
-   https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates
-   ```
-
-   Look for `"chat":{"id":` followed by a number, e.g. `"chat":{"id":871230075`.
-   That number is your **chat ID**.
-
-   *If you see `"result":[]`, send your bot another message and reload the page.*
-
----
-
-## Step 2: Install the apps on your phone
+## Step 1: Install the apps on your phone
 
 1. Install **Termux** and **Termux:API**.
    - Get both from **F-Droid** (https://f-droid.org), **or** both from Google Play.
-   - **Don't mix sources** (one from F-Droid, one from Play). That breaks the alarm features.
+   - **Don't mix sources** (one from F-Droid, one from Play). The alarm needs Termux:API,
+     and mixed sources break it.
 2. Stop Android from killing it at night:
    **Settings → Apps → Termux → Battery → Unrestricted**. Do the same for **Termux:API**.
 3. Allow notifications for Termux when asked.
@@ -104,7 +79,7 @@ The bot is what sends you messages. It's free and takes 2 minutes.
 
 ---
 
-## Step 3: Download BMS Show Alert
+## Step 2: Download BMS Show Alert
 
 In Termux, run these lines one at a time:
 
@@ -122,7 +97,7 @@ creates your settings file. It takes a few minutes; Chromium is a big download.
 
 ---
 
-## Step 4: Copy the cinema link from BookMyShow
+## Step 3: Copy the cinema link from BookMyShow
 
 1. Open **BookMyShow** in your phone's browser (Chrome), not the app.
 2. Go to the **cinema** you want (search the cinema name, or tap a cinema from any movie).
@@ -136,7 +111,7 @@ creates your settings file. It takes a few minutes; Chromium is a big download.
 
 ---
 
-## Step 5: Fill in your settings
+## Step 4: Fill in your settings
 
 In Termux:
 
@@ -153,8 +128,6 @@ MOVIE=Ramayana
 LANGUAGE=Telugu
 FORMAT=DOLBY CINEMA 3D
 CHECK_EVERY_SECONDS=150
-TELEGRAM_BOT_TOKEN=1234567890:AAH...xyz
-TELEGRAM_CHAT_ID=871230075
 ```
 
 Save and exit: **Ctrl+O**, **Enter**, then **Ctrl+X**.
@@ -165,11 +138,12 @@ Tips:
 - **MOVIE**: part of the name is enough (`Rama` works), capitals don't matter.
 - **LANGUAGE** / **FORMAT**: leave empty to accept any. Use commas for several:
   `FORMAT=IMAX 3D,DOLBY CINEMA 3D`.
-- Not sure how BookMyShow spells the format? Step 6 shows you.
+- Not sure how BookMyShow spells the format? Step 5 shows you.
+- The Telegram lines can stay empty. That's fine.
 
 ---
 
-## Step 6: Test everything
+## Step 5: Test everything
 
 **a) See what's listed** (and copy the exact spellings):
 
@@ -197,17 +171,18 @@ python bms_watch.py --once
 
 `"date_open": false` means "not open yet, keep waiting". That's normal.
 
-**c) Test your alerts:**
+**c) Test the alarm:**
 
 ```bash
 python bms_watch.py --test
 ```
 
-You should get a Telegram message and hear the alarm.
+Your phone should speak a test announcement and vibrate. Try it once with the phone in
+Do Not Disturb, to be sure it gets through.
 
 ---
 
-## Step 7: Start watching
+## Step 6: Start watching
 
 ```bash
 python bms_watch.py
@@ -218,8 +193,9 @@ Then:
 - **Leave Termux open** and lock your phone. Don't swipe Termux away from recent apps.
 - **Keep the phone charging**; loading pages every few minutes uses battery.
 - Make sure **Alarms are allowed** in Do Not Disturb / Bedtime mode
-  (Settings → Sounds → Do Not Disturb → Alarms: on).
-- You get a short **"still running"** Telegram message each day, so you know it's alive.
+  (Settings → Sounds → Do Not Disturb → Alarms: on). Most phones allow alarms by default.
+- Keep the **alarm volume up** (the script raises it, but some phones cap it).
+- If checks keep failing, you get a **phone notification** saying so.
 - To stop: tap the Termux screen and press **Ctrl+C**.
 
 **Watch two things at once?** Make a second settings file and run it in a new Termux
@@ -232,17 +208,36 @@ python bms_watch.py --config movie2.env
 
 ---
 
-## Optional: Telegram wake-up call
+## Optional: Telegram messages
 
-[CallMeBot](https://www.callmebot.com) can **phone you on Telegram** and read out the showtimes,
-which wakes you up better than a notification.
+The alarm is enough on its own. Add Telegram if you also want a message with the
+showtimes and a **booking link** you can tap straight away, plus a daily "still running"
+message so you know the watcher is alive.
 
-1. On callmebot.com, open **Telegram Call API** and follow the one-time steps there to let
-   CallMeBot call your Telegram account. (Your Telegram account needs a **username**:
-   Telegram → Settings → Username.)
-2. In `config.env`, set `CALLMEBOT_USER=@yourusername`
-3. Run `python bms_watch.py --test`. Your phone should ring on Telegram.
-4. Allow Telegram calls through Do Not Disturb.
+1. Open Telegram and search for **@BotFather** (it has a blue tick).
+2. Send it: `/newbot`
+3. Give it any name (e.g. `My Movie Alerts`) and a username ending in `bot`
+   (e.g. `mohan_movie_alert_bot`).
+4. BotFather replies with a **token** like `1234567890:AAH...xyz`.
+   **Keep it private**, it's like a password for your bot.
+5. Open your new bot (tap the link BotFather gives you) and press **Start**, or send it `hi`.
+6. Get your **chat ID**: in a browser, open this link with your token pasted in:
+
+   ```
+   https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates
+   ```
+
+   Look for `"chat":{"id":` followed by a number, e.g. `"chat":{"id":123456789`.
+   That number is your **chat ID**. (If you see `"result":[]`, message your bot again and
+   reload the page.)
+7. Put both in `config.env`:
+
+   ```ini
+   TELEGRAM_BOT_TOKEN=1234567890:AAH...xyz
+   TELEGRAM_CHAT_ID=123456789
+   ```
+
+8. Run `python bms_watch.py --test`. You should get a Telegram message too.
 
 ---
 
@@ -257,13 +252,12 @@ which wakes you up better than a notification.
 | `FORMAT` | Format(s), exactly as `--list` shows; empty = any | `DOLBY CINEMA 3D` |
 | `CHECK_EVERY_SECONDS` | Seconds between checks (minimum 60) | `150` |
 | `JITTER_SECONDS` | Random +/- added to each wait | `20` |
-| `TELEGRAM_BOT_TOKEN` | Your bot token from @BotFather | `1234:AA...` |
-| `TELEGRAM_CHAT_ID` | Your chat ID number | `871230075` |
-| `CALLMEBOT_USER` | Your Telegram @username for wake-up calls; empty = off | `@mohan` |
 | `PHONE_ALARM` | Loud alarm on the phone / spoken alert on a Mac | `true` |
-| `ALARM_ROUNDS` | How many times the alarm repeats | `8` |
-| `NOTIFY_WHEN_DATE_OPENS` | Tell you once when the date opens without your format | `true` |
-| `HEARTBEAT_HOUR` | Daily "still running" message after this hour (India time); empty = off | `9` |
+| `ALARM_ROUNDS` | How many times the alarm repeats (about 6 seconds each) | `15` |
+| `TELEGRAM_BOT_TOKEN` | Optional. Your bot token from @BotFather | `1234:AA...` |
+| `TELEGRAM_CHAT_ID` | Optional. Your chat ID number | `123456789` |
+| `NOTIFY_WHEN_DATE_OPENS` | Notify once when the date opens without your format | `true` |
+| `HEARTBEAT_HOUR` | Daily "still running" Telegram message after this hour (India time); empty = off | `9` |
 | `FAIL_ALERT_AFTER` | Warn after this many failed checks in a row | `5` |
 | `STOP_AFTER_FOUND` | Stop after the first alert (`true`) or keep watching for new shows (`false`) | `false` |
 | `FETCH_MODE` | `chromium` (recommended), `auto`, or `plain` | `chromium` |
@@ -291,12 +285,13 @@ Useful as a second watcher while your Mac is awake (it doesn't work while the Ma
    caffeinate -i python3 bms_watch.py
    ```
 
-`caffeinate -i` stops the Mac from sleeping while it watches. On a Mac the "alarm" is a
-spoken alert through the speakers, so rely on Telegram (and the wake-up call) on your phone.
+`caffeinate -i` stops the Mac from sleeping while it watches. On a Mac the alarm is a spoken
+alert through the speakers plus a notification, so keep the volume up (or add Telegram to get
+the alert on your phone).
 
-> **iPhone users:** iOS doesn't allow scripts to run in the background, so the iPhone can't
-> do the watching. Run the watcher on a Mac or an Android phone; your iPhone still gets the
-> Telegram message and call.
+> **iPhone users:** iOS doesn't allow scripts to run in the background, so an iPhone can't do
+> the watching. Run the watcher on a Mac or an Android phone, and set up Telegram to get the
+> alert on your iPhone.
 
 ---
 
@@ -304,27 +299,30 @@ spoken alert through the speakers, so rely on Telegram (and the wake-up call) on
 
 | You see | What it means / fix |
 |---|---|
-| `No mirror or mirror group selected` | Run `termux-change-repo` (Step 2.5). |
+| `No mirror or mirror group selected` | Run `termux-change-repo` (Step 1.5). |
 | `CANNOT LINK EXECUTABLE "curl": cannot locate symbol ...` | Termux packages are half-updated. Run `apt update && apt full-upgrade -y`. If that fails, reinstall Termux and Termux:API from F-Droid. |
-| `cp: cannot stat '.../storage/downloads/...'` | Termux has no storage access. Run `termux-setup-storage` and tap Allow. |
-| `Settings file not found` | Run `cp config.example.env config.env`, then edit it (Step 5). |
+| `Settings file not found` | Run `cp config.example.env config.env`, then edit it (Step 4). |
 | `Settings problem: ...` | The message says which setting is wrong and how to fix it. |
 | `BookMyShow returned HTTP 403` | Blocked. Make sure `FETCH_MODE=chromium`. |
 | `page title: "Attention Required! \| Cloudflare"` | BookMyShow's bot check blocked the page. Wait 30 to 60 minutes, increase `CHECK_EVERY_SECONDS`, and make sure you're on your home Wi-Fi or mobile data (not a VPN). |
 | `Chromium not found` | Run `pkg install x11-repo && pkg install chromium`. |
 | Lots of `dbus` / `inotify` error lines | Harmless Chromium noise. Ignore them. |
+| `Termux:API tools not found` / no alarm sound | Run `pkg install termux-api`, and install the **Termux:API** app from the same source as Termux. |
+| Alarm silent in Do Not Disturb | Allow **Alarms** in your Do Not Disturb / Bedtime settings, and turn up the alarm volume. |
+| It stopped overnight | Set Termux's battery setting to **Unrestricted**, keep the phone charging, and don't swipe Termux away. |
 | `Telegram error 401` | Bot token is wrong. Copy it again from @BotFather (`/mybots` → your bot → API Token). |
 | `Telegram error 400` | Chat ID is wrong, or you never pressed Start in your bot. |
-| No alarm sound | Install **Termux:API** from the same source as Termux, and allow Alarms in Do Not Disturb. |
-| It stopped overnight | Set Termux's battery setting to **Unrestricted**, keep the phone charging, and don't swipe Termux away. |
 
 ---
 
 ## FAQ
 
+**Do I need Telegram?** No. The phone alarm works on its own. Telegram just adds a message
+with the booking link and a daily "still running" message.
+
 **Is my bot token safe?** It's only stored in `config.env` on your phone. That file is
-excluded from git (see `.gitignore`), so it's never uploaded. Never paste your token in
-public chats. If you think it leaked, send `/revoke` to @BotFather and update `config.env`.
+excluded from git (see `.gitignore`), so it's never uploaded. If you think it leaked, send
+`/revoke` to @BotFather and update `config.env`.
 
 **Does it book tickets for me?** No. It only alerts you; you book in the BookMyShow app.
 

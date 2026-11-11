@@ -5,14 +5,14 @@ BMS Show Alert: get alerted the moment a BookMyShow show opens for booking.
 Watches one or more cinema pages for one or more dates and alerts you when your
 movie (optionally in a specific language and format) has shows listed.
 
-Alerts: Telegram message, Telegram voice call (CallMeBot), loud phone alarm (Termux),
-or a spoken alert on macOS.
+Alerts: a loud alarm on your Android phone (Termux) or a spoken alert on macOS,
+plus an optional Telegram message.
 
 Usage:
   python bms_watch.py            start watching (Ctrl+C to stop)
   python bms_watch.py --list     show which movies, languages and formats are listed
   python bms_watch.py --once     run one check and print the result
-  python bms_watch.py --test     send a test Telegram message / call / alarm
+  python bms_watch.py --test     test the alarm (and Telegram, if set up)
   python bms_watch.py --config other.env   use a different settings file
 
 Settings: config.env next to this script (copy config.example.env). See README.md.
@@ -33,7 +33,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MIN_INTERVAL = 60  # be polite to BookMyShow: never check more often than this
 
@@ -48,10 +48,8 @@ DEFAULTS = {
     "FETCH_MODE": "chromium",
     "TELEGRAM_BOT_TOKEN": "",
     "TELEGRAM_CHAT_ID": "",
-    "CALLMEBOT_USER": "",
-    "CALLMEBOT_LANG": "en-GB-Standard-B",
     "PHONE_ALARM": "true",
-    "ALARM_ROUNDS": "8",
+    "ALARM_ROUNDS": "15",
     "NOTIFY_WHEN_DATE_OPENS": "true",
     "HEARTBEAT_HOUR": "9",
     "FAIL_ALERT_AFTER": "5",
@@ -311,8 +309,7 @@ def check(cinema, date):
 def telegram(text):
     tok, chat = CFG["TELEGRAM_BOT_TOKEN"], CFG["TELEGRAM_CHAT_ID"]
     if not tok or not chat:
-        log("(Telegram not set up, message not sent)")
-        return False
+        return False  # Telegram is optional
     data = urllib.parse.urlencode({"chat_id": chat, "text": text, "parse_mode": "HTML",
                                    "disable_web_page_preview": "true"}).encode()
     try:
@@ -326,23 +323,25 @@ def telegram(text):
     return False
 
 
-def phone_call(text):
-    user = CFG["CALLMEBOT_USER"]
-    if not user:
-        return
-    qs = urllib.parse.urlencode({"user": user, "text": text, "lang": CFG["CALLMEBOT_LANG"], "rpt": "3"})
-    try:
-        urllib.request.urlopen(f"https://api.callmebot.com/start.php?{qs}", timeout=60).read()
-        log("Telegram voice call requested (CallMeBot)")
-    except Exception as e:
-        log("CallMeBot call failed:", e)
-
-
 def _run(*args):
     try:
         subprocess.run(args, timeout=60, capture_output=True)
     except Exception:
         pass
+
+
+def strip_html(s):
+    return re.sub(r"<[^>]+>", "", s).replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&")
+
+
+def notify(html, title="BMS Show Alert"):
+    """Status message: phone notification (Termux) or Mac notification, plus Telegram if set up."""
+    plain = strip_html(html)
+    if shutil.which("termux-notification"):
+        _run("termux-notification", "--id", "bms-status", "--title", title, "--content", plain)
+    elif platform.system() == "Darwin":
+        _run("osascript", "-e", f'display notification {json.dumps(plain)} with title {json.dumps(title)}')
+    telegram(html)
 
 
 def alarm(text, rounds=None):
@@ -385,7 +384,6 @@ def alert_found(result, cinema, date, fresh_ids):
              + "\n".join(lines) + f'\n\n<a href="{url}">Book now on BookMyShow</a>')
     times = ", ".join(sorted({s["time"] for s in result["shows"] if s["id"] in fresh_ids}))
     speech = f"Booking open. {CFG['MOVIE']}. {pretty_date(date)}. Shows at {times}."
-    phone_call(speech)
     alarm(speech)
 
 
@@ -419,11 +417,17 @@ def cmd_once(cinemas, dates):
 
 
 def cmd_test():
-    ok = telegram(f"Test from BMS Show Alert. Telegram works.\nWatching: {esc(target_label())}")
-    print("Telegram:", "sent" if ok else "NOT sent (see message above)")
-    if CFG["CALLMEBOT_USER"]:
-        phone_call("This is a test call from BMS Show Alert.")
+    print("Alarm: playing a short test alarm now...")
+    if CFG["PHONE_ALARM"].lower() != "true":
+        print("  (PHONE_ALARM=false, so no alarm. Set it to true in config.env.)")
+    elif not shutil.which("termux-tts-speak") and platform.system() != "Darwin":
+        print("  Termux:API tools not found: run  pkg install termux-api  and install the Termux:API app.")
     alarm("This is a test alarm from BMS Show Alert.", rounds=2)
+    if CFG["TELEGRAM_BOT_TOKEN"] and CFG["TELEGRAM_CHAT_ID"]:
+        ok = telegram(f"Test from BMS Show Alert. Telegram works.\nWatching: {esc(target_label())}")
+        print("Telegram:", "sent" if ok else "NOT sent (see message above)")
+    else:
+        print("Telegram: not set up (optional), skipped.")
     print("Test finished.")
 
 
@@ -440,7 +444,7 @@ def watch(cinemas, dates):
         active = [d for d in dates if d >= today_ist()]
         if not active:
             log("All dates have passed. Stopping.")
-            telegram(f"BMS Show Alert stopped: all dates for {esc(target_label())} have passed.")
+            notify(f"BMS Show Alert stopped: all dates for {esc(target_label())} have passed.")
             break
         for c in cinemas:
             for d in active:
@@ -451,7 +455,7 @@ def watch(cinemas, dates):
                     log(f"check failed ({st['fails']} in a row): {e}")
                     n = st["fails"]
                     if n == fail_after or (n > fail_after and (n - fail_after) % 25 == 0):
-                        telegram(f"<b>BMS Show Alert problem:</b> {n} checks in a row failed.\n{esc(e)}")
+                        notify(f"<b>BMS Show Alert problem:</b> {n} checks in a row failed.\n{esc(e)}")
                     continue
                 st["fails"] = 0
                 key = f"{c['code']}:{d}"
@@ -465,7 +469,7 @@ def watch(cinemas, dates):
                         st["found_any"] = True
                 elif r["is_open"] and key not in st["date_open"] and CFG["NOTIFY_WHEN_DATE_OPENS"].lower() == "true":
                     others = ", ".join(r["other_formats"]) or "no shows of this movie yet"
-                    telegram(f"<b>{pretty_date(d)} booking is open</b> at {esc(r['venue'])}, but nothing matches "
+                    notify(f"<b>{pretty_date(d)} booking is open</b> at {esc(r['venue'])}, but nothing matches "
                              f"{esc(target_label())} yet. Still watching.\nOther formats: {esc(others)}\n\n"
                              f'<a href="{page_url(c, d)}">Open BookMyShow</a>')
                     st["date_open"].append(key)
