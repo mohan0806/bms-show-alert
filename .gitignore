@@ -1,0 +1,10 @@
+# Your personal settings (contain your Telegram bot token). Never commit these.
+config.env
+*.env
+!config.example.env
+
+# Runtime state
+.state-*.json
+__pycache__/
+*.pyc
+*.html
