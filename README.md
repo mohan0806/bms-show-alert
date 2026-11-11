@@ -163,6 +163,11 @@ Save and exit: **Ctrl+O**, **Enter**, then **Ctrl+X**.
 
 Tips:
 
+- **DATES**: write dates as **YEAR-MONTH-DAY** with 4-digit year and 2-digit month and day:
+  `2026-11-12` means **12 November 2026**. Several dates: `2026-11-12,2026-11-13`
+  (comma, no spaces needed).
+  - ✔ `2026-11-12`  ✔ `20261112` (also accepted)
+  - ✘ `12-11-2026`  ✘ `12/11/2026`  ✘ `12 Nov`  ✘ `2026-11-5` (write `2026-11-05`)
 - **MOVIE**: part of the name is enough (`Rama` works), capitals don't matter.
 - **LANGUAGE** / **FORMAT**: leave empty to accept any. Use commas for several:
   `FORMAT=IMAX 3D,DOLBY CINEMA 3D`.
@@ -274,7 +279,7 @@ message so you know the watcher is alive.
 | Setting | What it does | Example |
 |---|---|---|
 | `CINEMA_URL` | Cinema page link(s) from BookMyShow. Comma-separate for several cinemas. | `https://in.bookmyshow.com/cinemas/...` |
-| `DATES` | Date(s) to book, YYYY-MM-DD, comma-separated | `2026-11-12,2026-11-13` |
+| `DATES` | Date(s) to book as YYYY-MM-DD (year-month-day, e.g. 12 Nov 2026 = `2026-11-12`), comma-separated | `2026-11-12,2026-11-13` |
 | `MOVIE` | Movie name, or part of it | `Ramayana` |
 | `LANGUAGE` | Language(s); empty = any | `Telugu` |
 | `FORMAT` | Format(s), exactly as `--list` shows; empty = any | `DOLBY CINEMA 3D` |
@@ -330,6 +335,7 @@ the alert on your phone).
 | `No mirror or mirror group selected` | Run `termux-change-repo` (Step 1.5). |
 | `CANNOT LINK EXECUTABLE "curl": cannot locate symbol ...` | Termux packages are half-updated. Run `apt update && apt full-upgrade -y`. If that fails, reinstall Termux and Termux:API from F-Droid. |
 | `Settings file not found` | Run `cp config.example.env config.env`, then edit it (Step 4). |
+| `Bad date '12-11-2026'` | Dates must be YEAR-MONTH-DAY: write `2026-11-12` (Step 4). |
 | `Settings problem: ...` | The message says which setting is wrong and how to fix it. |
 | `BookMyShow returned HTTP 403` | Blocked. Make sure `FETCH_MODE=chromium`. |
 | `page title: "Attention Required! \| Cloudflare"` | BookMyShow's bot check blocked the page. Wait 30 to 60 minutes, increase `CHECK_EVERY_SECONDS`, and make sure you're on your home Wi-Fi or mobile data (not a VPN). |

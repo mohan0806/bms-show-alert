@@ -113,9 +113,12 @@ def parse_dates():
     for d in raw:
         digits = d.replace("-", "").replace("/", "")
         try:
+            if len(digits) != 8 or not digits.isdigit():
+                raise ValueError
             datetime.datetime.strptime(digits, "%Y%m%d")
         except ValueError:
-            raise ConfigError(f"Bad date '{d}'. Use YYYY-MM-DD, e.g. 2026-11-12")
+            raise ConfigError(f"Bad date '{d}'. Use YEAR-MONTH-DAY with 2-digit month and day, "
+                              "e.g. 12 Nov 2026 = 2026-11-12 (not 12-11-2026)")
         dates.append(digits)
     return sorted(set(dates))
 
